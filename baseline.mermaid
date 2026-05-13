@@ -1,0 +1,56 @@
+sequenceDiagram
+    actor Researcher
+    participant UI
+    participant SubmissionController
+    participant Validator
+    participant Database
+    participant ReviewerManager
+    participant Reviewer
+    participant EvaluationManager
+    participant NotificationService
+
+    Researcher->>UI: submitResearchOutput(data)
+    UI->>SubmissionController: submit(data)
+    SubmissionController->>Validator: validateFormat(data)
+    Validator-->>SubmissionController: valid/invalid
+
+    alt invalid
+        SubmissionController-->>UI: return error
+    else valid
+        SubmissionController->>Database: saveSubmission(data)
+        Database-->>SubmissionController: confirmation
+
+        SubmissionController->>ReviewerManager: getAvailableReviewers()
+        ReviewerManager->>Database: fetchReviewers()
+        Database-->>ReviewerManager: reviewerList
+
+        ReviewerManager->>ReviewerManager: filterConflicts(reviewerList)
+        ReviewerManager->>ReviewerManager: checkWorkload(reviewerList)
+        ReviewerManager-->>SubmissionController: filteredReviewers
+
+        loop assign reviewers
+            SubmissionController->>Reviewer: assignReview()
+        end
+
+        SubmissionController->>EvaluationManager: startEvaluation()
+
+        loop each reviewer
+            Reviewer->>EvaluationManager: submitScore(score)
+            EvaluationManager->>Database: saveScore(score)
+        end
+
+        EvaluationManager->>EvaluationManager: calculateAverage()
+        EvaluationManager->>EvaluationManager: checkConsensus()
+        EvaluationManager->>EvaluationManager: applyRules()
+
+        alt accepted
+            EvaluationManager->>NotificationService: notifyAcceptance()
+        else rejected
+            EvaluationManager->>NotificationService: notifyRejection()
+        else revision
+            EvaluationManager->>NotificationService: notifyRevision()
+        end
+
+        NotificationService-->>Researcher: sendNotification()
+    end
+  
