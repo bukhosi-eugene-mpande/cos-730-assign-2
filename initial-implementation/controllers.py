@@ -1,7 +1,6 @@
 import os
 import random
 from database import upload_to_r2, Database
-from suprsend import Suprsend
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -59,23 +58,33 @@ class NotificationService:
         self._send(email, 'Revision', title)
 
     def _send(self, email, status, title):
-        workspace_key = os.getenv('SUPRSEND_WORKSPACE_KEY')
-        workspace_secret = os.getenv('SUPRSEND_WORKSPACE_SECRET')
-        template_slug = os.getenv('SUPRSEND_TEMPLATE_SLUG')
+        import resend
 
-        if not all([workspace_key, workspace_secret, template_slug]):
+        api_key = os.getenv('RESEND_API_KEY')
+        if not api_key:
             print(f"[NotificationService] Notify {email}: '{status}' for '{title}'")
             return
 
-        supr_client = Suprsend(workspace_key, workspace_secret)
-        event_name = f"RESEARCH_{status.upper()}"
-        event_props = {"title": title, "status": status}
+        resend.api_key = api_key
+
+        body = (
+            f"Dear Researcher,\n\n"
+            f"Your submission \"{title}\" has been reviewed.\n\n"
+            f"Outcome: {status}\n\n"
+            f"Thank you for your submission.\n\n"
+            f"— Peer Review System"
+        )
 
         try:
-            supr_client.track(email, event_name, event_props)
-            print(f"[NotificationService] Event '{event_name}' tracked for {email}")
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": email,
+                "subject": f"Research Submission {status}: {title}",
+                "text": body,
+            })
+            print(f"[NotificationService] Email sent to {email}: {status} — {title}")
         except Exception as e:
-            print(f"[NotificationService] Error sending notification: {e}")
+            print(f"[NotificationService] Email error: {e}")
 
 
 class EvaluationManager:

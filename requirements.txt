@@ -1,0 +1,4 @@
+nicegui==3.11.1
+boto3==1.39.15
+python-dotenv==1.2.2
+resend
