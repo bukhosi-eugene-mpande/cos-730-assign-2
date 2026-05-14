@@ -1,0 +1,55 @@
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{pdflscape}
+
+% A4 portrait
+\geometry{a4paper, portrait, margin=2cm}
+
+% Colour palette
+\definecolor{headingdark}{RGB}{26, 54, 93}
+\definecolor{headingmid}{RGB}{44, 82, 130}
+\definecolor{rulegrey}{RGB}{180, 190, 200}
+
+% Fonts
+\setmainfont{SFNS.ttf}[
+  Path=/System/Library/Fonts/,
+  ItalicFont=SFNSItalic.ttf,
+  BoldFont=SFNS.ttf,
+  BoldFeatures={FakeBold=2}
+]
+\setmonofont{SFNSMono.ttf}[
+  Path=/System/Library/Fonts/,
+  ItalicFont=SFNSMonoItalic.ttf
+]
+
+% ── Heading styles ────────────────────────────────────────────────────────────
+\makeatletter
+
+\renewcommand\section{%
+  \@startsection{section}{1}{\z@}%
+    {-22pt \@plus -4pt \@minus -2pt}%
+    {8pt \@plus 2pt}%
+    {\color{headingdark}\Large\bfseries\sectionrule}}
+
+\newcommand{\sectionrule}[1]{%
+  #1\par\nobreak
+  \vspace{2pt}%
+  {\color{rulegrey}\hrule height 0.7pt}%
+  \vspace{4pt}%
+}
+
+\renewcommand\subsection{%
+  \@startsection{subsection}{2}{\z@}%
+    {-14pt \@plus -3pt \@minus -2pt}%
+    {5pt \@plus 1pt}%
+    {\color{headingmid}\large\bfseries}}
+
+\renewcommand\subsubsection{%
+  \@startsection{subsubsection}{3}{\z@}%
+    {-10pt \@plus -2pt \@minus -1pt}%
+    {3pt \@plus 1pt}%
+    {\color{headingdark}\normalsize\bfseries}}
+
+\makeatother
