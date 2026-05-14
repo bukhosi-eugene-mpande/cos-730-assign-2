@@ -62,33 +62,52 @@ Each participant maps to a dedicated Python class in the implementation:
 
 The table below maps every message in the baseline sequence diagram to its corresponding method in the codebase.
 
-
-| No. | Diagram Message | Caller | Callee | Method | File |
-|---|---|---|---|---|---|
-| 1 | `submitResearchOutput(data)` | Researcher (UI action) | `UI` | `submit()` async handler | `main.py:35` |
-| 2 | `submit(data)` | `UI` | `SubmissionController` | `SubmissionController().submit(data)` | `main.py:43` |
-| 3 | `validateFormat(data)` | `SubmissionController` | `Validator` | `Validator.validate_format(data)` | `controllers.py:113` |
-| 4 | `return valid/invalid` | `Validator` | `SubmissionController` | return value `(bool, str)` | `controllers.py:21` |
-| 5 | `return error` | `SubmissionController` | `UI` | `return False, message` | `controllers.py:115` |
-| 6 | `saveSubmission(data)` | `SubmissionController` | `Database` | `_db.save_submission(...)` | `controllers.py:122` |
-| 7 | `return confirmation` | `Database` | `SubmissionController` | return `submission_id` | `database.py:35` |
-| 8 | `getAvailableReviewers()` | `SubmissionController` | `ReviewerManager` | `reviewer_manager.get_available_reviewers()` | `controllers.py:125` |
-| 9 | `fetchReviewers()` | `ReviewerManager` | `Database` | `_db.fetch_reviewers()` | `controllers.py:33` |
-| 10 | `return reviewerList` | `Database` | `ReviewerManager` | return `list[int]` | `database.py:43` |
-| 11 | `filterConflicts(reviewerList)` | `ReviewerManager` (self) | `ReviewerManager` | `self.filter_conflicts(reviewer_list)` | `controllers.py:34` |
-| 12 | `checkWorkload(reviewerList)` | `ReviewerManager` (self) | `ReviewerManager` | `self.check_workload(filtered)` | `controllers.py:35` |
-| 13 | `return filteredReviewers` | `ReviewerManager` | `SubmissionController` | return `list[int]` | `controllers.py:37` |
-| 14 | `assignReview()` (loop) | `SubmissionController` | `Reviewer` | `reviewer.assign_review(submission_id)` | `controllers.py:128` |
-| 15 | `startEvaluation()` | `SubmissionController` | `EvaluationManager` | `evaluation_manager.start_evaluation(submission_id)` | `controllers.py:131` |
-| 16 | `submitScore(score)` (loop) | `Reviewer` | `EvaluationManager` | `reviewer.submit_score(sid, score, EvaluationManager())` | `main.py:108` |
-| 17 | `saveScore(score)` | `EvaluationManager` | `Database` | `_db.save_score(submission_id, reviewer_id, score)` | `controllers.py:86` |
-| 18 | `calculateAverage()` | `EvaluationManager` (self) | `EvaluationManager` | `self.calculate_average(scores)` | `controllers.py:95` |
-| 19 | `checkConsensus()` | `EvaluationManager` (self) | `EvaluationManager` | `self.check_consensus(scores)` | `controllers.py:96` |
-| 20 | `applyRules()` | `EvaluationManager` (self) | `EvaluationManager` | `self.apply_rules(avg, consensus)` | `controllers.py:97` |
-| 21 | `notifyAcceptance()` | `EvaluationManager` | `NotificationService` | `notification_service.notify_acceptance(...)` | `controllers.py:101` |
-| 22 | `notifyRejection()` | `EvaluationManager` | `NotificationService` | `notification_service.notify_rejection(...)` | `controllers.py:103` |
-| 23 | `notifyRevision()` | `EvaluationManager` | `NotificationService` | `notification_service.notify_revision(...)` | `controllers.py:105` |
-| 24 | `sendNotification()` | `NotificationService` | Researcher | `resend.Emails.send(...)` | `controllers.py:70` |
+```{=latex}
+\clearpage
+\newgeometry{paperwidth=560mm, paperheight=210mm, margin=1.5cm}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{ p{0.7cm} p{6cm} p{5cm} p{5cm} p{11cm} p{4.5cm} }
+\hline
+\textbf{No.} & \textbf{Diagram Message} & \textbf{Caller} & \textbf{Callee} & \textbf{Method} & \textbf{File} \\
+\hline
+\endfirsthead
+\multicolumn{6}{c}{\textit{(continued from previous page)}} \\
+\hline
+\textbf{No.} & \textbf{Diagram Message} & \textbf{Caller} & \textbf{Callee} & \textbf{Method} & \textbf{File} \\
+\hline
+\endhead
+\hline
+\endfoot
+1 & \texttt{submitResearchOutput(data)} & Researcher (UI action) & \texttt{UI} & \texttt{submit()} async handler & \texttt{main.py:35} \\
+2 & \texttt{submit(data)} & \texttt{UI} & \texttt{SubmissionController} & \texttt{SubmissionController().submit(data)} & \texttt{main.py:43} \\
+3 & \texttt{validateFormat(data)} & \texttt{SubmissionController} & \texttt{Validator} & \texttt{Validator.validate\_format(data)} & \texttt{controllers.py:113} \\
+4 & \texttt{return valid/invalid} & \texttt{Validator} & \texttt{SubmissionController} & return value \texttt{(bool, str)} & \texttt{controllers.py:21} \\
+5 & \texttt{return error} & \texttt{SubmissionController} & \texttt{UI} & \texttt{return False, message} & \texttt{controllers.py:115} \\
+6 & \texttt{saveSubmission(data)} & \texttt{SubmissionController} & \texttt{Database} & \texttt{\_db.save\_submission(...)} & \texttt{controllers.py:122} \\
+7 & \texttt{return confirmation} & \texttt{Database} & \texttt{SubmissionController} & return \texttt{submission\_id} & \texttt{database.py:35} \\
+8 & \texttt{getAvailableReviewers()} & \texttt{SubmissionController} & \texttt{ReviewerManager} & \texttt{reviewer\_manager.get\_available\_reviewers()} & \texttt{controllers.py:125} \\
+9 & \texttt{fetchReviewers()} & \texttt{ReviewerManager} & \texttt{Database} & \texttt{\_db.fetch\_reviewers()} & \texttt{controllers.py:33} \\
+10 & \texttt{return reviewerList} & \texttt{Database} & \texttt{ReviewerManager} & return \texttt{list[int]} & \texttt{database.py:43} \\
+11 & \texttt{filterConflicts(reviewerList)} & \texttt{ReviewerManager} (self) & \texttt{ReviewerManager} & \texttt{self.filter\_conflicts(reviewer\_list)} & \texttt{controllers.py:34} \\
+12 & \texttt{checkWorkload(reviewerList)} & \texttt{ReviewerManager} (self) & \texttt{ReviewerManager} & \texttt{self.check\_workload(filtered)} & \texttt{controllers.py:35} \\
+13 & \texttt{return filteredReviewers} & \texttt{ReviewerManager} & \texttt{SubmissionController} & return \texttt{list[int]} & \texttt{controllers.py:37} \\
+14 & \texttt{assignReview()} (loop) & \texttt{SubmissionController} & \texttt{Reviewer} & \texttt{reviewer.assign\_review(submission\_id)} & \texttt{controllers.py:128} \\
+15 & \texttt{startEvaluation()} & \texttt{SubmissionController} & \texttt{EvaluationManager} & \texttt{evaluation\_manager.start\_evaluation(submission\_id)} & \texttt{controllers.py:131} \\
+16 & \texttt{submitScore(score)} (loop) & \texttt{Reviewer} & \texttt{EvaluationManager} & \texttt{reviewer.submit\_score(sid, score, EvaluationManager())} & \texttt{main.py:108} \\
+17 & \texttt{saveScore(score)} & \texttt{EvaluationManager} & \texttt{Database} & \texttt{\_db.save\_score(submission\_id, reviewer\_id, score)} & \texttt{controllers.py:86} \\
+18 & \texttt{calculateAverage()} & \texttt{EvaluationManager} (self) & \texttt{EvaluationManager} & \texttt{self.calculate\_average(scores)} & \texttt{controllers.py:95} \\
+19 & \texttt{checkConsensus()} & \texttt{EvaluationManager} (self) & \texttt{EvaluationManager} & \texttt{self.check\_consensus(scores)} & \texttt{controllers.py:96} \\
+20 & \texttt{applyRules()} & \texttt{EvaluationManager} (self) & \texttt{EvaluationManager} & \texttt{self.apply\_rules(avg, consensus)} & \texttt{controllers.py:97} \\
+21 & \texttt{notifyAcceptance()} & \texttt{EvaluationManager} & \texttt{NotificationService} & \texttt{notification\_service.notify\_acceptance(...)} & \texttt{controllers.py:101} \\
+22 & \texttt{notifyRejection()} & \texttt{EvaluationManager} & \texttt{NotificationService} & \texttt{notification\_service.notify\_rejection(...)} & \texttt{controllers.py:103} \\
+23 & \texttt{notifyRevision()} & \texttt{EvaluationManager} & \texttt{NotificationService} & \texttt{notification\_service.notify\_revision(...)} & \texttt{controllers.py:105} \\
+24 & \texttt{sendNotification()} & \texttt{NotificationService} & Researcher & \texttt{resend.Emails.send(...)} & \texttt{controllers.py:70} \\
+\hline
+\end{longtable}
+\clearpage
+\restoregeometry
+```
 
 
 ### 2.4 Class Descriptions
@@ -855,26 +874,46 @@ File uploads are persisted to Cloudflare R2 object storage. Download links gener
 ### 6.2 Interaction Traceability  Optimised Diagram to Code
 
 
-| No. | Optimised Diagram Message | Caller | Callee | Method | File |
-|---|---|---|---|---|---|
-| 1 | `submitResearchOutput(data)` | Researcher (UI action) | UI | `submit()` async handler | `main.py:33` |
-| 2 | `submit(data)` | UI | `SubmissionController` | `SubmissionController().submit(data)` | `main.py:41` |
-| 3 | `validateFormat(data)` | `SubmissionController` | `Validator` | `Validator.validate_format(data)` | `controllers.py:97` |
-| 4 | `valid/invalid` | `Validator` | `SubmissionController` | return `(bool, str)` | `controllers.py:14` |
-| 5 | `saveSubmission(data)` | `SubmissionController` | `Database` | `_db.save_submission(...)` | `controllers.py:104` |
-| 6 | `submissionId` | `Database` | `SubmissionController` | return `int` | `database.py:62` |
-| 7 | `assignReviewers(submissionId)` | `SubmissionController` | `ReviewerManager` | `reviewer_manager.assign_reviewers(submission_id)` | `controllers.py:107` |
-| 8 | `fetchEligibleReviewers(submissionId)` | `ReviewerManager` | `Database` | `_db.fetch_reviewers()` | `controllers.py:27` |
-| 9 | `saveAssignments(submissionId, eligibleReviewers)` | `ReviewerManager` | `Database` | `_db.save_assignments(submission_id, selected)` | `controllers.py:30` |
-| 10 | `confirmed` | `Database` | `ReviewerManager` | return from `save_assignments` | `database.py:76` |
-| 11 | `assigned` | `ReviewerManager` | `SubmissionController` | return `selected` | `controllers.py:31` |
-| 12 | `success` | `SubmissionController` | UI | `return True, msg` | `controllers.py:109` |
-| 13 | `submitScore(submissionId, reviewerId, score)` [loop] | UI | `EvaluationManager` | `EvaluationManager().submit_score(sid, reviewer_id, score)` | `main.py:80` |
-| 14 | `saveScore(submissionId, reviewerId, score)` | `EvaluationManager` | `Database` | `_db.save_score(...)` | `controllers.py:46` |
-| 15 | `evaluate(submissionId)` [opt] | `EvaluationManager` (self) | `EvaluationManager` | `self.evaluate(submission_id)` | `controllers.py:57` |
-| 16 | `updateStatus(submissionId, status)` | `EvaluationManager` | `Database` | `_db.update_status(...)` | `controllers.py:58` |
-| 17 | `notify(email, status, title)` | `EvaluationManager` | `NotificationService` | `notification_service.notify(email, status, title)` | `controllers.py:61` |
-| 18 | `sendNotification()` | `NotificationService` | Researcher | `resend.Emails.send(...)` | `controllers.py:38` |
+```{=latex}
+\clearpage
+\newgeometry{paperwidth=560mm, paperheight=210mm, margin=1.5cm}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{ p{0.7cm} p{7cm} p{5cm} p{5cm} p{11cm} p{4cm} }
+\hline
+\textbf{No.} & \textbf{Optimised Diagram Message} & \textbf{Caller} & \textbf{Callee} & \textbf{Method} & \textbf{File} \\
+\hline
+\endfirsthead
+\multicolumn{6}{c}{\textit{(continued from previous page)}} \\
+\hline
+\textbf{No.} & \textbf{Optimised Diagram Message} & \textbf{Caller} & \textbf{Callee} & \textbf{Method} & \textbf{File} \\
+\hline
+\endhead
+\hline
+\endfoot
+1 & \texttt{submitResearchOutput(data)} & Researcher (UI action) & \texttt{UI} & \texttt{submit()} async handler & \texttt{main.py:33} \\
+2 & \texttt{submit(data)} & \texttt{UI} & \texttt{SubmissionController} & \texttt{SubmissionController().submit(data)} & \texttt{main.py:41} \\
+3 & \texttt{validateFormat(data)} & \texttt{SubmissionController} & \texttt{Validator} & \texttt{Validator.validate\_format(data)} & \texttt{controllers.py:97} \\
+4 & \texttt{valid/invalid} & \texttt{Validator} & \texttt{SubmissionController} & return \texttt{(bool, str)} & \texttt{controllers.py:14} \\
+5 & \texttt{saveSubmission(data)} & \texttt{SubmissionController} & \texttt{Database} & \texttt{\_db.save\_submission(...)} & \texttt{controllers.py:104} \\
+6 & \texttt{submissionId} & \texttt{Database} & \texttt{SubmissionController} & return \texttt{int} & \texttt{database.py:62} \\
+7 & \texttt{assignReviewers(submissionId)} & \texttt{SubmissionController} & \texttt{ReviewerManager} & \texttt{reviewer\_manager.assign\_reviewers(submission\_id)} & \texttt{controllers.py:107} \\
+8 & \texttt{fetchEligibleReviewers(submissionId)} & \texttt{ReviewerManager} & \texttt{Database} & \texttt{\_db.fetch\_reviewers()} & \texttt{controllers.py:27} \\
+9 & \texttt{saveAssignments(submissionId, eligibleReviewers)} & \texttt{ReviewerManager} & \texttt{Database} & \texttt{\_db.save\_assignments(submission\_id, selected)} & \texttt{controllers.py:30} \\
+10 & \texttt{confirmed} & \texttt{Database} & \texttt{ReviewerManager} & return from \texttt{save\_assignments} & \texttt{database.py:76} \\
+11 & \texttt{assigned} & \texttt{ReviewerManager} & \texttt{SubmissionController} & return \texttt{selected} & \texttt{controllers.py:31} \\
+12 & \texttt{success} & \texttt{SubmissionController} & \texttt{UI} & \texttt{return True, msg} & \texttt{controllers.py:109} \\
+13 & \texttt{submitScore(submissionId, reviewerId, score)} [loop] & \texttt{UI} & \texttt{EvaluationManager} & \texttt{EvaluationManager().submit\_score(sid, reviewer\_id, score)} & \texttt{main.py:80} \\
+14 & \texttt{saveScore(submissionId, reviewerId, score)} & \texttt{EvaluationManager} & \texttt{Database} & \texttt{\_db.save\_score(...)} & \texttt{controllers.py:46} \\
+15 & \texttt{evaluate(submissionId)} [opt] & \texttt{EvaluationManager} (self) & \texttt{EvaluationManager} & \texttt{self.evaluate(submission\_id)} & \texttt{controllers.py:57} \\
+16 & \texttt{updateStatus(submissionId, status)} & \texttt{EvaluationManager} & \texttt{Database} & \texttt{\_db.update\_status(...)} & \texttt{controllers.py:58} \\
+17 & \texttt{notify(email, status, title)} & \texttt{EvaluationManager} & \texttt{NotificationService} & \texttt{notification\_service.notify(email, status, title)} & \texttt{controllers.py:61} \\
+18 & \texttt{sendNotification()} & \texttt{NotificationService} & Researcher & \texttt{resend.Emails.send(...)} & \texttt{controllers.py:38} \\
+\hline
+\end{longtable}
+\clearpage
+\restoregeometry
+```
 
 
 ### 6.3 ClassbyClass Implementation
@@ -1195,10 +1234,6 @@ The `Reviewer` class has been removed from the interaction model. If perreviewer
 ![Figure 8  Summary: % Reduction from Baseline to Optimised](graphs/fig8_summary.png)
 
 
-```{=latex}
-\begin{landscape}
-```
-
 | Metric | Baseline | Optimised | Change |
 |---|---|---|---|
 | Submission mean time (ms) | 1.2077 | 0.6761 | **−44.0%** |
@@ -1217,10 +1252,6 @@ The `Reviewer` class has been removed from the interaction model. If perreviewer
 | `EvaluationManager` cyclomatic complexity | 15 | 9 | **−40%** |
 | `NotificationService` cyclomatic complexity | 6 | 3 | **−50%** |
 | `SubmissionController` efferent coupling | 5 | 3 | **−40%** |
-
-```{=latex}
-\end{landscape}
-```
 
 
 [!] = measured regression; root cause documented in Section 7.6.
